@@ -60,9 +60,24 @@ module.exports = {
         const animalCollection = await animals()
 
         // We have to create a mongo ID out of the string in order to match the ID in the database
-        let newId = new mongo.ObjectID(id)
-        
-        const animal = await animalCollection.findOne({_id: newId})
+        // Try catch to override the default error during the string conversion <------
+        let newId
+        try{
+            newId = new mongo.ObjectID(id)
+        }
+        catch(e){
+            throw("Error animals.get: Invalid ID")
+        }
+        let animal
+        try{
+            animal = await animalCollection.findOne({_id: newId})
+        }
+        catch(e){
+            throw("Error animals.get: No animal with that ID")
+        }
+
+        //let newId = new mongo.ObjectID(id)
+        //const animal = await animalCollection.findOne({_id: newId})
 
         // If nothing was found in the database
         if(!animal){

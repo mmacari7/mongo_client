@@ -22,13 +22,13 @@ async function main() {
     //     console.log(e)
     // }
 
-    // try{
-    //     let o = await animals.get("DragonMan")
-    //     console.log(o)
-    // }
-    // catch(e){
-    //     console.log(e)
-    // }
+    try{
+        let o = await animals.get("5c770c8c2c07b33c7cf370ea")
+        console.log(o)
+    }
+    catch(e){
+        console.log(e)
+    }
 
     // try{
     //     let a = await animals.remove("5c75e4c1ce3abf2d84018a95")
@@ -38,13 +38,13 @@ async function main() {
     //     console.log(e)
     // }
 
-    try{
-        let a = await animals.rename("5c770eaebc4c743b5c10431d", "John")
-        console.log(a)
-    }
-    catch(e){
-        console.log(e)
-    }
+    // try{
+    //     let a = await animals.rename("5c770eaebc4c743b5c10431d", "John")
+    //     console.log(a)
+    // }
+    // catch(e){
+    //     console.log(e)
+    // }
 
     const db = await connection()
     await db.serverConfig.close();
