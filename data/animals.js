@@ -2,6 +2,7 @@
 // Animals Data
 
 // Sets collections to the collections file
+const mongo = require("mongodb")
 const collections = require("./collections.js")
 // Stores the animals collection function in animals
 const animals = collections.animals;
@@ -50,12 +51,20 @@ module.exports = {
     },
     // Function to get a specific item in animal collections by id
     async get(id){
+        // Checks if id is undefined
         if(!id){
             throw("Error animals.get: id was not defined")
         }
+
+        // Gets the collection from the database
         const animalCollection = await animals()
 
-        const animal = await animalCollection.findOne({_id: id})
+        // We have to create a mongo ID out of the string in order to match the ID in the database
+        let newId = new mongo.ObjectID(id)
+        
+        const animal = await animalCollection.findOne({_id: newId})
+
+        // If nothing was found in the database
         if(!animal){
             throw("Error animals.get: No animal with that ID")
         }
@@ -65,10 +74,69 @@ module.exports = {
     },
     // Function to remove a specific animal
     async remove(id){
+        // Check id exists
+        if(!id){
+            throw("Error animals.remove: id was not defined")
+        }
+        // Get the collection
+        const animalCollection = await animals()
+
+        // Convert string to mongo ObjectID
+        let newId = new mongo.ObjectID(id)
+
+        // Get the animal at ID
+        const animal = await this.get(newId)
+
+        // Attempt deltion
+        const deletionInfo = await animalCollection.removeOne({_id: newId})
+
+        // Throw error if deletion was not possible
+        if(deletionInfo.deletedCount === 0){
+            throw("Error animals.remove: Could not delete animal")
+        }
+
+        return({"deleted": true, "data": animal})
 
     },
 
     async rename(id, newName){
+        // Check ID definition
+        if(!id){
+            throw("Error animals.rename: id was not defined")
+        }
 
+        // Check that a new name was passed
+        if(!newName){
+            throw("Error animals.rename: No new name was provided")
+        }
+        if(typeof newName !== 'string' || !newName instanceof String){
+            throw("Error animals.rename: The name provided was not of type string")
+        }
+
+        // Get the animals
+        const animalCollection = await animals()
+
+        // Convert the id string to a mongo ObjectID
+        let newId = mongo.ObjectID(id)
+
+        // Get the animal at the ID
+        let animal = await this.get(newId)
+
+        // Create the new item to insert with the changed name at ID
+        let update = {$set: {
+            name:newName,
+            animalType: animal.animalType
+        }};
+
+        // Perform the update
+        const updateInfo = await animalCollection.updateOne({_id: newId}, update)
+
+        // If nothing was updated throw
+        if(updateInfo.modifiedCount === 0){
+            throw("Error animals.rename: Could not update animal, possible duplicate")
+        }
+
+        // Return the newly updated animal at the ID
+        return(await this.get(newId))
     }
 }
