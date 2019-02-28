@@ -59,15 +59,26 @@ module.exports = {
         // Gets the collection from the database
         const animalCollection = await animals()
 
-        // We have to create a mongo ID out of the string in order to match the ID in the database
-        // Try catch to override the default error during the string conversion <------
+        if(typeof id !== 'string' && typeof id !== 'object'){
+            throw("Error animals.get: Invalid id type passed in")
+        }
+
+        // If the id passed is not already a mongo id object, we attempt to make it one, otherwise throw
         let newId
-        try{
-            newId = new mongo.ObjectID(id)
+        if(typeof(id) !== 'object'){
+            
+            try{
+                newId = new mongo.ObjectID(id)
+            }
+            catch(e){
+                throw("Error animals.get: Invalid ID")
+            }
         }
-        catch(e){
-            throw("Error animals.get: Invalid ID")
+        else{
+            newId = id
         }
+        
+        // Try to find the animal in the data base with the ID throw error if not in db
         let animal
         try{
             animal = await animalCollection.findOne({_id: newId})
@@ -76,10 +87,7 @@ module.exports = {
             throw("Error animals.get: No animal with that ID")
         }
 
-        //let newId = new mongo.ObjectID(id)
-        //const animal = await animalCollection.findOne({_id: newId})
-
-        // If nothing was found in the database
+        // If no animal is returned, then throw
         if(!animal){
             throw("Error animals.get: No animal with that ID")
         }
@@ -93,11 +101,30 @@ module.exports = {
         if(!id){
             throw("Error animals.remove: id was not defined")
         }
+        // Checks that the input id is string
+        if(typeof(id) !== 'string' && typeof id !== 'object'){
+            throw("Error animals.remove: Invalid ID type")
+        }
+
+
         // Get the collection
         const animalCollection = await animals()
 
-        // Convert string to mongo ObjectID
-        let newId = new mongo.ObjectID(id)
+
+        // Convert string to mongo ObjectID if not already Object
+        let newId
+        if(typeof(id) !== 'object'){
+            
+            try{
+                newId = new mongo.ObjectID(id)
+            }
+            catch(e){
+                throw("Error animals.get: Invalid ID")
+            }
+        }
+        else{
+            newId = id
+        }
 
         // Get the animal at ID
         const animal = await this.get(newId)
@@ -120,19 +147,35 @@ module.exports = {
             throw("Error animals.rename: id was not defined")
         }
 
+        if(typeof id !== 'string' && typeof id !== 'object'){
+            throw("Error animals.rename: id passed not correct type")
+        }
+
         // Check that a new name was passed
         if(!newName){
             throw("Error animals.rename: No new name was provided")
         }
-        if(typeof newName !== 'string' || !newName instanceof String){
+        if(typeof newName !== 'string'){
             throw("Error animals.rename: The name provided was not of type string")
         }
 
         // Get the animals
         const animalCollection = await animals()
 
-        // Convert the id string to a mongo ObjectID
-        let newId = mongo.ObjectID(id)
+        // Convert the id string to a mongo ObjectID in try catch if not object
+        let newId
+        if(typeof(id) !== 'object'){
+            
+            try{
+                newId = new mongo.ObjectID(id)
+            }
+            catch(e){
+                throw("Error animals.get: Invalid ID")
+            }
+        }
+        else{
+            newId = id
+        }
 
         // Get the animal at the ID
         let animal = await this.get(newId)

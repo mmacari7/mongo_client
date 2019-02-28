@@ -2,53 +2,45 @@
 // Entry point
 const connection = require("./data/connection")
 const animals = require("./data/animals")
+const mongo = require("mongodb")
 
 // Creates a main function to test animals functions
 async function main() {
-    // try{
-    //     let newAn = await animals.create('Mortimer', 'Giraffe')
-    //     //console.log(typeof newAn._id)
-    //     console.log(newAn)
-    // }
-    // catch(e){
-    //     console.log(e)
-    // }
+    // 1. Create an animal named Sasha with the type of Dog
+    let sasha = await animals.create('Sasha', 'Dog')
 
-    // try{
-    //     let a = await animals.getAll()
-    //     console.log(a)
-    // }
-    // catch(e){
-    //     console.log(e)
-    // }
+    // 2. Log the newly created animal
+    console.log(sasha)
 
-    try{
-        let o = await animals.get("5c770c8c2c07b33c7cf370ea")
-        console.log(o)
-    }
-    catch(e){
-        console.log(e)
-    }
+    // 3. Create an animal named Lucy, with the type of Dog
+    let lucy = await animals.create('Lucy', 'Dog')
 
-    // try{
-    //     let a = await animals.remove("5c75e4c1ce3abf2d84018a95")
-    //     console.log(a)
-    // }
-    // catch(e){
-    //     console.log(e)
-    // }
+    // 4. Query all animals, and log them all
+    let allAnimals = await animals.getAll()
+    console.log(allAnimals)
 
-    // try{
-    //     let a = await animals.rename("5c770eaebc4c743b5c10431d", "John")
-    //     console.log(a)
-    // }
-    // catch(e){
-    //     console.log(e)
-    // }
+    // 5. Create an animal named Duke, with a type of Walrus
+    let duke = await animals.create('Duke', 'Walrus')
+
+    // 6. Log the newly created Duke
+    console.log(duke)
+    
+    // 7. Rename Sasha to Sashita
+    let sashita = await animals.rename(sasha._id, "Sashita")
+
+    // 8. Log the newly named Sashita
+    console.log(sashita)
+
+    // 9. Remove Lucy
+    let remLucy = await animals.remove(lucy._id)
+
+    // 10. Query all animals, log them all
+    allAnimals = await animals.getAll()
+    console.log(allAnimals)
 
     const db = await connection()
     await db.serverConfig.close();
-    //console.log("Done!")
+    
 
 }
 
